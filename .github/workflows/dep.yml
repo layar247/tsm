@@ -1,0 +1,55 @@
+name: docker
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Ваши шаги здесь
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # ...
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    container:
+      image: your-image:tag  # Обязательно с отступом!
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: kubsu
+          POSTGRES_PASSWORD: kubsu
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: kubsu
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      # Ваши шаги тестирования здесь
+      # ...
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      - name: Deploy application
+        run: |
+          # Ваши команды деплоя здесь
+          echo "Deploy step"
+
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify deployment
+        run: |
+          # Ваши команды верификации здесь
+          echo "Verify step"
